@@ -34,7 +34,7 @@ jobs:
         - system: Windows-MSYS-x64
           runner: windows-latest
           msystem: ucrt64
-          extra-cmake-args: -G "MSYS Makefiles"
+          extra-cmake-args: -G "MSYS Makefiles" -DSDL_VIDEO_OPENGL_EGL=0
           exe-extension: .exe
 
         - system: MacOS-ARM
