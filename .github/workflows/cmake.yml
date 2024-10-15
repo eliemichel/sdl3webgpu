@@ -51,10 +51,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set shell
-      shell: bash
-      run: echo "SHELL=${{ matrix.shell }}" >> $GITHUB_ENV
-    
     - name: Install dependencies
       if: ${{ matrix.install-deps }}
       run: ${{ matrix.install-deps }}
@@ -64,7 +60,7 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         msystem: ${{ matrix.msystem }}
-        pacboy: cmake:p egl-headers:p
+        pacboy: cmake:p egl-headers:p ninja:p
 
     - name: Configure CMake
       if: ${{ ! matrix.msystem }}
