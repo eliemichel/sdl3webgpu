@@ -36,7 +36,6 @@ jobs:
           msystem: ucrt64
           extra-cmake-args: -G "MSYS Makefiles"
           exe-extension: .exe
-          shell: msys2 {0}
 
         - system: MacOS-ARM
           runner: macos-latest
@@ -47,12 +46,15 @@ jobs:
         exclude:
         - webgpu-backend: DAWN
           link-type: STATIC
-        
-        
+  
     runs-on: ${{ matrix.runner }}
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set shell
+      shell: bash
+      run: echo "SHELL=${{ matrix.shell }}" >> $GITHUB_ENV
     
     - name: Install dependencies
       if: ${{ matrix.install-deps }}
@@ -66,7 +68,7 @@ jobs:
         pacboy: cmake:p egl-headers:p
 
     - name: Configure CMake
-      shell: ${{ matrix.shell }}
+      if: ${{ ! matrix.msystem }}
       run: >
         cmake
         -S examples
@@ -77,7 +79,29 @@ jobs:
         ${{ matrix.extra-cmake-args }}
 
     - name: Build
-      shell: ${{ matrix.shell }}
+      if: ${{ ! matrix.msystem }}
+      run: >
+        cmake
+        --build build
+        --config ${{ matrix.build-type }}
+
+    # This is a hack to work around the lack of ${{ variables }} in 'shell' parameter
+    # We use the SHELL env variable as the value of 'shell'
+    - name: Configure CMake (MSYS)
+      if: ${{ matrix.msystem }}
+      shell: msys2 {0}
+      run: >
+        cmake
+        -S examples
+        -B build
+        -DWEBGPU_BACKEND=${{ matrix.webgpu-backend }}
+        -D${{ matrix.webgpu-backend }}_LINK_TYPE=${{ matrix.link-type }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+        ${{ matrix.extra-cmake-args }}
+
+    - name: Build (MSYS)
+      if: ${{ matrix.msystem }}
+      shell: msys2 {0}
       run: >
         cmake
         --build build
