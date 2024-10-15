@@ -60,7 +60,11 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         msystem: ${{ matrix.msystem }}
-        pacboy: cmake:p egl-headers:p ninja:p
+        pacboy: >-
+          toolchain:p
+          egl-headers:p
+          cmake:p
+          ninja:p
 
     - name: Configure CMake
       if: ${{ ! matrix.msystem }}
