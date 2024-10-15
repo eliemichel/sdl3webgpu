@@ -7,7 +7,7 @@ include(utils.cmake)
 
 # Dependencies
 FetchContent_Declare(
-  sdl2
+  sdl3
   GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
   GIT_TAG        preview-3.1.3
 )
@@ -16,7 +16,7 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/eliemichel/WebGPU-distribution.git
   GIT_TAG        479541d24699fddb60a903da081203bdbe4735a7  # fetch
 )
-FetchContent_MakeAvailable(sdl2 webgpu)
+FetchContent_MakeAvailable(sdl3 webgpu)
 
 # The sdl3webgpu target
 # NB: We specify a second argument only because this is an out-of-tree

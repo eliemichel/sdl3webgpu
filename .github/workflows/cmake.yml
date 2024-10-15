@@ -34,8 +34,9 @@ jobs:
         - system: Windows-MSYS-x64
           runner: windows-latest
           msystem: ucrt64
-          extra-cmake-args: -G "MSYS Makefiles" -DSDL_VIDEO_OPENGL_EGL=0
+          extra-cmake-args: -G "MSYS Makefiles"
           exe-extension: .exe
+          shell: msys2 {0}
 
         - system: MacOS-ARM
           runner: macos-latest
@@ -65,6 +66,7 @@ jobs:
         pacboy: cmake:p egl-headers:p
 
     - name: Configure CMake
+      shell: ${{ matrix.shell }}
       run: >
         cmake
         -S examples
@@ -75,6 +77,7 @@ jobs:
         ${{ matrix.extra-cmake-args }}
 
     - name: Build
+      shell: ${{ matrix.shell }}
       run: >
         cmake
         --build build
