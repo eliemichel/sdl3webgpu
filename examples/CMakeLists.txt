@@ -6,17 +6,46 @@ include(FetchContent)
 include(utils.cmake)
 
 # Dependencies
-FetchContent_Declare(
-  sdl3
-  GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-  GIT_TAG        preview-3.1.3
-)
-FetchContent_Declare(
-  webgpu
-  GIT_REPOSITORY https://github.com/eliemichel/WebGPU-distribution.git
-  GIT_TAG        479541d24699fddb60a903da081203bdbe4735a7  # fetch
-)
-FetchContent_MakeAvailable(sdl3 webgpu)
+if (EMSCRIPTEN)
+
+  add_library(SDL3_SDL3 INTERFACE)
+  target_compile_options(SDL3_SDL3 INTERFACE --use-port=sdl3) # NB: This port does not exist yet, emscripten is not supported
+  add_library(SDL3::SDL3 ALIAS SDL3_SDL3)
+  function(target_copy_sdl3_binaries)
+  endfunction()
+
+  add_library(webgpu INTERFACE)
+  target_link_options(webgpu INTERFACE -sUSE_WEBGPU=1)
+  function(target_copy_webgpu_binaries)
+  endfunction()
+
+else()
+
+  FetchContent_Declare(
+    sdl3
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+    GIT_TAG        preview-3.1.3
+  )
+  FetchContent_Declare(
+    webgpu
+    GIT_REPOSITORY https://github.com/eliemichel/WebGPU-distribution.git
+    GIT_TAG        479541d24699fddb60a903da081203bdbe4735a7  # fetch
+  )
+  FetchContent_MakeAvailable(sdl3 webgpu)
+
+  function(target_copy_sdl3_binaries Target)
+    add_custom_command(
+      TARGET ${Target}
+      POST_BUILD
+      COMMAND
+        ${CMAKE_COMMAND}
+        -E copy_if_different
+        $<TARGET_FILE:SDL3::SDL3>
+        $<TARGET_FILE_DIR:${Target}>
+    )
+  endfunction()
+  
+endif()
 
 # The sdl3webgpu target
 # NB: We specify a second argument only because this is an out-of-tree
@@ -31,14 +60,6 @@ target_treat_all_warnings_as_errors(hello-sdl3webgpu)
 
 # Copy wgpu-native or Dawn dll/so/dylib next to the executable
 target_copy_webgpu_binaries(hello-sdl3webgpu)
-
 # Copy SDL3.dll/so/dylib next to the executable
-add_custom_command(
-  TARGET hello-sdl3webgpu
-  POST_BUILD
-  COMMAND
-    ${CMAKE_COMMAND}
-    -E copy_if_different
-    $<TARGET_FILE:SDL3::SDL3>
-    $<TARGET_FILE_DIR:hello-sdl3webgpu>
-)
+target_copy_sdl3_binaries(hello-sdl3webgpu)
+

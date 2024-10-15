@@ -95,7 +95,6 @@ jobs:
         -DWEBGPU_BACKEND=${{ matrix.webgpu-backend }}
         -D${{ matrix.webgpu-backend }}_LINK_TYPE=${{ matrix.link-type }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        ${{ matrix.extra-cmake-args }}
 
     - name: Build (MSYS)
       if: ${{ matrix.msystem }}
