@@ -10,6 +10,7 @@ if (EMSCRIPTEN)
 
   add_library(SDL3_SDL3 INTERFACE)
   target_compile_options(SDL3_SDL3 INTERFACE --use-port=sdl3) # NB: This port does not exist yet, emscripten is not supported
+  target_link_options(SDL3_SDL3 INTERFACE --use-port=sdl3) # NB: This port does not exist yet, emscripten is not supported
   add_library(SDL3::SDL3 ALIAS SDL3_SDL3)
   function(target_copy_sdl3_binaries)
   endfunction()
