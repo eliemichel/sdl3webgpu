@@ -8,8 +8,8 @@ include(utils.cmake)
 # Dependencies
 FetchContent_Declare(
   sdl2
-  GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-  GIT_TAG        preview-3.1.3
+  GIT_REPOSITORY https://github.com/madebr/SDL
+  GIT_TAG        cmake-egl-gles
 )
 FetchContent_Declare(
   webgpu
