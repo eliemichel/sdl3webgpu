@@ -34,7 +34,6 @@ jobs:
         - system: Windows-MSYS-x64
           runner: windows-latest
           msystem: ucrt64
-          extra-cmake-args: -G "MSYS Makefiles" -DSDL_VIDEO_OPENGL_EGL=0
           exe-extension: .exe
 
         - system: MacOS-ARM
@@ -46,13 +45,12 @@ jobs:
         exclude:
         - webgpu-backend: DAWN
           link-type: STATIC
-        
-        
+  
     runs-on: ${{ matrix.runner }}
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Install dependencies
       if: ${{ matrix.install-deps }}
       run: ${{ matrix.install-deps }}
@@ -62,9 +60,14 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         msystem: ${{ matrix.msystem }}
-        pacboy: cmake:p egl-headers:p
+        pacboy: >-
+          toolchain:p
+          egl-headers:p
+          cmake:p
+          ninja:p
 
     - name: Configure CMake
+      if: ${{ ! matrix.msystem }}
       run: >
         cmake
         -S examples
@@ -72,9 +75,30 @@ jobs:
         -DWEBGPU_BACKEND=${{ matrix.webgpu-backend }}
         -D${{ matrix.webgpu-backend }}_LINK_TYPE=${{ matrix.link-type }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        ${{ matrix.extra-cmake-args }}
 
     - name: Build
+      if: ${{ ! matrix.msystem }}
+      run: >
+        cmake
+        --build build
+        --config ${{ matrix.build-type }}
+
+    # This is a hack to work around the lack of ${{ variables }} in 'shell' parameter
+    # We use the SHELL env variable as the value of 'shell'
+    - name: Configure CMake (MSYS)
+      if: ${{ matrix.msystem }}
+      shell: msys2 {0}
+      run: >
+        cmake
+        -S examples
+        -B build
+        -DWEBGPU_BACKEND=${{ matrix.webgpu-backend }}
+        -D${{ matrix.webgpu-backend }}_LINK_TYPE=${{ matrix.link-type }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+
+    - name: Build (MSYS)
+      if: ${{ matrix.msystem }}
+      shell: msys2 {0}
       run: >
         cmake
         --build build
