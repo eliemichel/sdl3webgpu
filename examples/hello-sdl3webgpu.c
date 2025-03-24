@@ -38,9 +38,7 @@ int main(int argc, char* argv[]) {
 	(void)argv;
 
 	// Init WebGPU
-	WGPUInstanceDescriptor desc;
-	desc.nextInChain = NULL;
-	WGPUInstance instance = wgpuCreateInstance(&desc);
+	WGPUInstance instance = wgpuCreateInstance(NULL);
 
 	// Init SDL
 	SDL_Init(SDL_INIT_VIDEO);

@@ -24,13 +24,13 @@ else()
 
   FetchContent_Declare(
     sdl3
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG        release-3.2.8
+    URL https://github.com/libsdl-org/SDL/archive/refs/tags/release-3.2.8.zip
+    URL_HASH MD5=1a4affbf987808da38a0d6c8aa802a5e
   )
   FetchContent_Declare(
     webgpu
-    GIT_REPOSITORY https://github.com/eliemichel/WebGPU-distribution.git
-    GIT_TAG        main-v0.3.0-alpha
+    URL https://github.com/eliemichel/WebGPU-distribution/archive/refs/tags/main-v0.3.0-alpha.zip
+    URL_HASH MD5=ea1195dc6c7661c36aa13ea5b734b86e
   )
   FetchContent_MakeAvailable(sdl3 webgpu)
 
