@@ -65,19 +65,14 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window* window) {
         metal_layer = [CAMetalLayer layer];
         [ns_window.contentView setLayer : metal_layer];
 
-#  ifdef WEBGPU_BACKEND_DAWN
         WGPUSurfaceSourceMetalLayer fromMetalLayer;
         fromMetalLayer.chain.sType = WGPUSType_SurfaceSourceMetalLayer;
-#  else
-        WGPUSurfaceDescriptorFromMetalLayer fromMetalLayer;
-        fromMetalLayer.chain.sType = WGPUSType_SurfaceDescriptorFromMetalLayer;
-#  endif
         fromMetalLayer.chain.next = NULL;
         fromMetalLayer.layer = metal_layer;
 
         WGPUSurfaceDescriptor surfaceDescriptor;
         surfaceDescriptor.nextInChain = &fromMetalLayer.chain;
-        surfaceDescriptor.label = NULL;
+        surfaceDescriptor.label = (WGPUStringView){ NULL, WGPU_STRLEN };
 
         return wgpuInstanceCreateSurface(instance, &surfaceDescriptor);
     }
@@ -94,19 +89,14 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window* window) {
 
         [ui_view.layer addSublayer: metal_layer];
 
-#  ifdef WEBGPU_BACKEND_DAWN
         WGPUSurfaceSourceMetalLayer fromMetalLayer;
         fromMetalLayer.chain.sType = WGPUSType_SurfaceSourceMetalLayer;
-#  else
-        WGPUSurfaceDescriptorFromMetalLayer fromMetalLayer;
-        fromMetalLayer.chain.sType = WGPUSType_SurfaceDescriptorFromMetalLayer;
-#  endif
         fromMetalLayer.chain.next = NULL;
         fromMetalLayer.layer = metal_layer;
 
         WGPUSurfaceDescriptor surfaceDescriptor;
         surfaceDescriptor.nextInChain = &fromMetalLayer.chain;
-        surfaceDescriptor.label = NULL;
+        surfaceDescriptor.label = (WGPUStringView){ NULL, WGPU_STRLEN };
 
         return wgpuInstanceCreateSurface(instance, &surfaceDescriptor);
     }
@@ -117,20 +107,15 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window* window) {
         Window x11_window = (Window)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
         if (!x11_display || !x11_window) return NULL;
 
-#    ifdef WEBGPU_BACKEND_DAWN
         WGPUSurfaceSourceXlibWindow fromXlibWindow;
         fromXlibWindow.chain.sType = WGPUSType_SurfaceSourceXlibWindow;
-#    else
-        WGPUSurfaceDescriptorFromXlibWindow fromXlibWindow;
-        fromXlibWindow.chain.sType = WGPUSType_SurfaceDescriptorFromXlibWindow;
-#    endif
         fromXlibWindow.chain.next = NULL;
         fromXlibWindow.display = x11_display;
         fromXlibWindow.window = x11_window;
 
         WGPUSurfaceDescriptor surfaceDescriptor;
         surfaceDescriptor.nextInChain = &fromXlibWindow.chain;
-        surfaceDescriptor.label = NULL;
+        surfaceDescriptor.label = (WGPUStringView){ NULL, WGPU_STRLEN };
 
         return wgpuInstanceCreateSurface(instance, &surfaceDescriptor);
     }
@@ -141,20 +126,15 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window* window) {
         struct wl_surface *wayland_surface = (struct wl_surface *)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
         if (!wayland_display || !wayland_surface) return NULL;
 
-#    ifdef WEBGPU_BACKEND_DAWN
         WGPUSurfaceSourceWaylandSurface fromWaylandSurface;
         fromWaylandSurface.chain.sType = WGPUSType_SurfaceSourceWaylandSurface;
-#    else
-        WGPUSurfaceDescriptorFromWaylandSurface fromWaylandSurface;
-        fromWaylandSurface.chain.sType = WGPUSType_SurfaceDescriptorFromWaylandSurface;
-#    endif
         fromWaylandSurface.chain.next = NULL;
         fromWaylandSurface.display = wayland_display;
         fromWaylandSurface.surface = wayland_surface;
 
         WGPUSurfaceDescriptor surfaceDescriptor;
         surfaceDescriptor.nextInChain = &fromWaylandSurface.chain;
-        surfaceDescriptor.label = NULL;
+        surfaceDescriptor.label = (WGPUStringView){ NULL, WGPU_STRLEN };
 
         return wgpuInstanceCreateSurface(instance, &surfaceDescriptor);
     }
@@ -165,32 +145,22 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window* window) {
         if (!hwnd) return NULL;
         HINSTANCE hinstance = GetModuleHandle(NULL);
 
-#  ifdef WEBGPU_BACKEND_DAWN
         WGPUSurfaceSourceWindowsHWND fromWindowsHWND;
         fromWindowsHWND.chain.sType = WGPUSType_SurfaceSourceWindowsHWND;
-#  else
-        WGPUSurfaceDescriptorFromWindowsHWND fromWindowsHWND;
-        fromWindowsHWND.chain.sType = WGPUSType_SurfaceDescriptorFromWindowsHWND;
-#  endif
         fromWindowsHWND.chain.next = NULL;
         fromWindowsHWND.hinstance = hinstance;
         fromWindowsHWND.hwnd = hwnd;
 
         WGPUSurfaceDescriptor surfaceDescriptor;
         surfaceDescriptor.nextInChain = &fromWindowsHWND.chain;
-        surfaceDescriptor.label = NULL;
+        surfaceDescriptor.label = (WGPUStringView){ NULL, WGPU_STRLEN };
 
         return wgpuInstanceCreateSurface(instance, &surfaceDescriptor);
     }
 #elif defined(__EMSCRIPTEN__)
     {
-#  ifdef WEBGPU_BACKEND_DAWN
-        WGPUSurfaceSourceCanvasHTMLSelector_Emscripten fromCanvasHTMLSelector;
-        fromCanvasHTMLSelector.chain.sType = WGPUSType_SurfaceSourceCanvasHTMLSelector_Emscripten;
-#  else
         WGPUSurfaceDescriptorFromCanvasHTMLSelector fromCanvasHTMLSelector;
         fromCanvasHTMLSelector.chain.sType = WGPUSType_SurfaceDescriptorFromCanvasHTMLSelector;
-#  endif
         fromCanvasHTMLSelector.chain.next = NULL;
         fromCanvasHTMLSelector.selector = "canvas";
 

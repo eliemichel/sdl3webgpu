@@ -30,7 +30,7 @@ else()
   FetchContent_Declare(
     webgpu
     GIT_REPOSITORY https://github.com/eliemichel/WebGPU-distribution.git
-    GIT_TAG        479541d24699fddb60a903da081203bdbe4735a7  # fetch
+    GIT_TAG        main-v0.3.0-alpha
   )
   FetchContent_MakeAvailable(sdl3 webgpu)
 
