@@ -45,9 +45,6 @@
 #  include <Metal/Metal.h>
 #elif defined(SDL_PLATFORM_WIN32)
 #  include <windows.h>
-#elif defined(SDL_PLATFORM_LINUX)
-#  include <X11/Xlib.h>
-#  include <wayland-client-core.h>
 #endif
 
 #include <SDL3/SDL.h>
@@ -101,8 +98,8 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window* window) {
     }
 #elif defined(SDL_PLATFORM_LINUX)
     if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0) {
-        Display *x11_display = (Display *)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, NULL);
-        Window x11_window = (Window)SDL_GetNumberProperty(props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
+        void *x11_display = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, NULL);
+        uint64_t x11_window = SDL_GetNumberProperty(props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
         if (!x11_display || !x11_window) return NULL;
 
         WGPUSurfaceSourceXlibWindow fromXlibWindow;
@@ -118,14 +115,14 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window* window) {
         return wgpuInstanceCreateSurface(instance, &surfaceDescriptor);
     }
     else if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0) {
-        struct wl_display *wayland_display = (struct wl_display *)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, NULL);
-        struct wl_surface *wayland_surface = (struct wl_surface *)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
+        void *wayland_display = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, NULL);
+        void *wayland_surface = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
         if (!wayland_display || !wayland_surface) return NULL;
 
         WGPUSurfaceSourceWaylandSurface fromWaylandSurface;
         fromWaylandSurface.chain.sType = WGPUSType_SurfaceSourceWaylandSurface;
         fromWaylandSurface.chain.next = NULL;
-        fromWaylandSurface.display = wayland_display;
+        fromWaylandSurface.display = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, NULL);
         fromWaylandSurface.surface = wayland_surface;
 
         WGPUSurfaceDescriptor surfaceDescriptor;
@@ -133,7 +130,7 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window* window) {
         surfaceDescriptor.label = (WGPUStringView){ NULL, WGPU_STRLEN };
 
         return wgpuInstanceCreateSurface(instance, &surfaceDescriptor);
-    } else return NULL;
+    }
 #elif defined(SDL_PLATFORM_WIN32)
     {
         HWND hwnd = (HWND)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
