@@ -60,25 +60,27 @@ Thanks to this extension it is possible to simply write a fully cross-platform W
 #include <stdio.h>
 
 int main(int argc, char* argv[]) {
+	(void)argc;
+	(void)argv;
+
 	// Init WebGPU
-	WGPUInstanceDescriptor desc;
-	desc.nextInChain = NULL;
-	WGPUInstance instance = wgpuCreateInstance(&desc);
+	WGPUInstance instance = wgpuCreateInstance(NULL);
 
 	// Init SDL
 	SDL_Init(SDL_INIT_VIDEO);
-	SDL_Window *window = SDL_CreateWindow("Learn WebGPU", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
+	SDL_Window *window = SDL_CreateWindow("Learn WebGPU", 640, 480, 0);
 
 	// Here we create our WebGPU surface from the window!
 	WGPUSurface surface = SDL_GetWGPUSurface(instance, window);
-	printf("surface = %p", surface);
+	printf("surface = %p", (void*)surface);
 
 	// Wait for close
 	SDL_Event event;
-	while (1)
+	int running = 1;
+	while (running)
 		while (SDL_PollEvent(&event))
-			if (event.type == SDL_QUIT)
-				break;
+			if (event.type == SDL_EVENT_QUIT)
+				running = 0;
 	// Terminate SDL
 	SDL_DestroyWindow(window);
 	SDL_Quit();
